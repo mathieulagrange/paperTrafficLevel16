@@ -19,18 +19,7 @@
 
 % Title.
 % --------------------
-\title{Estimating traffic noise level using acoustic monitoring : a preliminary study}
-
-% Single addresses (uncomment and modify for single-address case).
-% --------------------
-%\name{Author(s) Name(s)\thanks{Thanks to XYZ agency for funding.}}
-%\address{Author Affiliation(s)}
-%
-% For example:
-% ------------
-%\address{School\\
-%       Department\\
-%       Address}
+\title{Estimating traffic noise levels using acoustic monitoring : a preliminary study}
 
 % Two addresses
 % --------------------
@@ -55,57 +44,43 @@
 \begin{sloppy}
 
 \begin{abstract}
-%  In order to help authors prepare their manuscripts for 
-%  submission to DCASE 2016 and generate IEEE Xplore-compatible 
-%  PDFs, we compile a list of guidelines and put together two
-%  templates for users of both \LaTeX\ and Microsoft Word, which
-%  can be downloaded from the workshop website at \cite{dcase2016web}.
-%  These guidelines and templates are modified from those for past
-%  ICASSP and WASPAA workshops, so an experienced author who 
-%  has published something in these conferences/workshops will 
-%  find it easy to follow the guidelines and use the templates.
+In this paper, the Non-negative Matrix Factorization is applied for isolating the contribution of road traffic from acoustic measurements in urban sound mixtures. This method is tested on simulated scenes to enable a better control of the presence of different sound sources. The presented first results show the potential of the method.
 \end{abstract}
 
 \begin{keywords}
-One, two, three, four, five
+Non-negative Matrix Factorization, road traffic noise mapping, urban measurements
 \end{keywords}
 
-\section{Introduction}
-\label{sec:intro}
+\section{INTRODUCTION AND MOTIVATIONS}
+\label{sec:motivations}
 
-Gêne 
-Contexte normatif
-motivation (rapide)
-structure du papier
+Noise in cities is one of the main sources of annoyance essentially caused by road, air an drail traffic. To know better the noise distribution, the number of people impacted and to preserve the quiet areas, the European Directive 2002/49/EC \cite{directive} requires that cities over 250 000 inhabitants produce noise maps for road, air and rail traffic. Road traffic noise maps are produced basedon a census of the traffic volumes and mean speeds along the main roads which allows estimating their acoustic emission. Knowing the city topography, the acoustic propagation within the streets is then calculated. In addition, noise Observatories are being deployed in some agglomerations. They aim to facilitating both the mandatory five year update of maps and the validation of simulated noise maps. More advanced, combining classical noise maps with measures would be a promising approach to converge towards more accurate noise maps \cite{Can} \cite{deCoensel}.
 
 
-\section{Motivations}
-\label{sec:format}
+However, this requires being able to isolate from measurements the road traffic contribution within a sound mixture that contain many others sources. This task is made difficult by the large variety of the sounds that compose the urban sound environments both in sound spectrum and temporel structure (car, klaxon, bird, music, horn, siren...) and by the overlapping of these sounds. Different techniques exists and were shown relevant for recognition or detection in urban environment \cite{Aucouturier} \cite{defreville} but they do not take account of overlapping between the sources. Methods for source separation, such as Computational Auditory Scene Analysis or Independant Composant Analysis are efficient but were not conceived for urban applications. The first one was developed to simulated the human auditory system \cite{brown} whereas the second one requires as many sensors as sound sources \cite{Comon}, which is unrealistic in an urban context.
 
-Norme europe
-modèle de propagation
-Réseaux de capteurs pas cher
-besoin de calibration des modèles de propa
-utilisation brut des données
+The Non-negative Matrix Factorization (NMF) \cite{lee1999} presents the advantage to deal with the overlap between the sound sources. It has been used for many applications in audio domain as polyphonic music transcription \cite{smaragdis2003} or for source separation in musical content \cite{Virtanen2005}. Thus the NMF seems to be the most suitable method for isolation from measurements the contribution of road traffic. We propose to apply it on a corpus of urban sound mixtures to test its ability to estimate the road traffic noise levels. The specificity of urban sound environments, and the facts that the method has never been used on this corpus of sounds, stands as a challenge and will require specific adaptations.
 
-\section{Method}
-To seek this problem, we use the nonnegative matrix factorization \cite{lee1999} (NMF). This dimension-reduction technique consists in 
+In this paper, we present the implementation of our experimental plan and some first results. Section~\ref{sec:method} exposes the NMF theoreticaly framework. Then the experiment and the results are presented in section~\ref{sec:experiment}.
+
+
+\section{METHOD EMPLOYED}\label{sec:method}
+The Non-negative Matrix Factorization \cite{lee1999} is a dimension-reduction technique expressed by
 
 \begin{equation}\label{eq:NMF}
 \mathbf{V} \approx \mathbf{WH}
 \end{equation}
 
-where $\mathbf{V}$, $F \times N$, is the power spectrogram of an audio, $\mathbf{W}$, $F \times K$, is the basis matrix and $\mathbf{H}$, $K \times N$, is the feature matrix. This approximation method is used for multiple applications as learning parts of images or text \cite{lee1999}, for polyphonic music transcription \cite{smaragdis2003}...
-The approximation \ref{eq:NMF} is determined by a minimization problem
+where $\mathbf{V}_{F \times N}$, is the power spectrogram of an audio, $\mathbf{W}_{F \times K}$, is the basis matrix, representing a set of sound spectra usually found in urban areas, and $\mathbf{H}_{K \times N}$ is the feature matrix standing for the temporal variation of each spectrum. All these elements presents the constraint to be positive leading to only additive combinations. The approximation \ref{eq:NMF} is determined by a minimization problem
 
 \begin{equation}\label{eq:minCost}
-\underset{\mathbf{W},\mathbf{H} \geq 0}{\text{min }} D(V\vert\vert WH).
+\underset{\mathbf{W},\mathbf{H} \geq 0}{\text{min }} D(\mathbf{V}\vert\vert \mathbf{WH}).
 \end{equation}
 
-$D(V\vert\vert WH)$ is called function cost and can take different forms \cite{amari2010}. In this study, we keep the most popular expressions which belong to the class of Bregman divergences and to the sub-class of $\beta$-divergence, the euclidian distance ($\beta = 2$)
+$D(\mathbf{V}\vert\vert \mathbf{WH})$ is called function cost, a dissimilarity measure usually belonging to the $\beta$-divergence for the NMF. 3 popular expressions are compared in this study namely the Euclidian distance ($\beta = 2$),
 
 \begin{equation}\label{eq:distEUC}
-D_{EUC}(V\vert\vert WH) = \|\| V- WH \|\|, 
+D_{EUC}(\mathbf{V} \vert \vert \mathbf{WH}) =  \vert\vert \mathbf{V} - \mathbf{WH} \vert\vert , 
 \end{equation} 
 
 the Kullback-Leibler divergence, ($\beta = 1$), 
@@ -117,87 +92,90 @@ D_{KL}(V\vert\vert WH) = \mathbf{V}\log\frac{\mathbf{V}}{\mathbf{WH}}-\mathbf{V}
 and the Itakura-Saïto divergence, ($\beta = 0$), 
  
 \begin{equation}\label{eq:divIS}
-D_{IS}(V\vert\vert WH) = frac{\mathbf{V}}{\mathbf{WH}} -\log\frac{\mathbf{V}}{\mathbf{WH}}-1.
+D_{IS}(V\vert\vert WH) = \frac{\mathbf{V}}{\mathbf{WH}} -\log\frac{\mathbf{V}}{\mathbf{WH}}-1.
 \end{equation}
 
-In the case of unsupervised NMF, (\ref{eq:minCost}) is resolved iteratively where $\mathbf{W}$ is update in first for $\mathbf{H}$ fixed and then $\mathbf{H}$ is update with the new $\mathbf{W}$ fixed. Here, we considered the supervised NMF where $\mathbf{W}$ is fixed and only $\mathbf{H}$ is updated.
+Here, the supervised NMF is considered where $\mathbf{W}$ is fixed and only $\mathbf{H}$ is updated.
 
-Different algorithms were developped to proposed an update of $\mathbf{H}$ with the prove of convergence \cite{lee2001} \cite{amari2011}. The choosen method is the maximisation-minimisation algorithm proposed by F\'{e}votte and Idier \cite{fevotte2011}.
+The choosen algorithm is the maximisation-minimisation algorithm proposed by F\'{e}votte and Idier \cite{fevotte2011}.
 
 \begin{equation}
-\mathbf{H} = \mathbf{H}\left(\frac{\mathbf{W}^T\left[\mathbf{WH}^{\beta-2}.\mathbf{V} \right]}{W^T \left[ \mathbf{WH} \right]^{\beta-1}}\right)^{\gamma(\beta)}
+\mathbf{H} \longleftarrow \mathbf{H}.\left(\frac{\mathbf{W}^T\left[\mathbf{WH}^{\beta-2}.\mathbf{V} \right]}{\mathbf{W}^T \left[ \mathbf{WH} \right]^{\beta-1}}\right)^{\gamma(\beta)}
 \end{equation}
 
-where $\gamma(\beta) = 1$ for $\beta \in [1 2]$ and $\gamma(\beta) = \dfrac{1}{2}$ for $\beta = 0$. Currently, $H$ is updated for a number of iteration fixed at 100.
+where $\gamma(\beta) = 1$ for $\beta \in [1~2]$ and $\gamma(\beta) = \dfrac{1}{2}$ for $\beta = 0$. Currently, $\mathbf{H}$ is updated for a number of iteration fixed at 100.
 
-When the iteration is over, for each temporal frame, the traffic sound level is calculated with the element related to traffic $\mathbf{\tilde{V}}_{traffic} = \mathbf{WH}_{traffic}$,
+When the iteration is over, for each temporal frame, the traffic sound level is calculated with the element related to traffic $\mathbf{\tilde{V}}_{tr} = \left[\mathbf{WH}\right]_{tr}$,
 
-\begin{equation}
-L_{p,n} = 20\log\frac{\sum\mathbf{v_{n_{traffic}}}}{p_ref}
+\begin{equation}\label{eq:Lp}
+\tilde{L}_{p,n} = 20\log\frac{\sum\mathbf{\mathbf{\tilde{v}}_{\mathbf{n},tr}}}{p_{0}}
 \end{equation}
 
-with $\tilde{v}_n$, the $n$-th frame of matrix $V$ and $ p_{ref} = 2\times 10^{-5}$ Pa, the sound pressure reference. The equivalent trafic sound level, $L_{eq,tr}$ (\ref{eq:Leq}) is then determined by
+with $\mathbf{\tilde{v}_{n,tr}}$, the $n$-th frame of matrix $\mathbf{\tilde{V}}_{tr}$ and $ p_{0} = 2\times 10^{-5}$ Pa, the sound pressure of reference. The equivalent traffic sound level estimated, $\tilde{L}_{eq,tr}$, is then determined by
 
-\begin{equation}
-L_{eq,tr} = \frac{1}{T} \sum 10\log (10^{L_{p,n}/10}
+\begin{equation}\label{eq:Leq}
+\tilde{L}_{eq,tr} = \frac{1}{T} \sum 10\log \left(10^{\tilde{L}_{p,n}/10}\right)
 \end{equation}
 
 where $T$ is the duration of $\mathbf{V}$.\\
 
-The choice of using the NMF is justified by the consideration of overlap between the sound sources, the ease to implement this method and that it was never used for this kind of sound environnement.
+\section{EXPERIMENT AND RESULTS}\label{sec:experiment}
 
-\section{Experiment}
+To evaluate the ablilty of the NMF framework to estimate the sound traffic level, we consider simulated sounds mixtures where the actual level of contribution of the traffic is known. This solution ensures controlling the road traffic level relatively to the other sources in comparison to real recordings where the real traffic sound level, $L_{eq,tr}$, would not be correctly determined. Furthermore, working on sound mixtures simulated will create a controled framework where the time of presence of each source is exactly known.
 
-To evaluate the ablilty of the NMF framework to estimate the sound traffic level, we consider simulated sounds mixtures where the actual level of contribution of the traffic is known. Indeed, in real recordings, the traffic sound level, $L_{eq,tr}$, is not correctly known as the traffic overlap with other sound sources that are not of intesrest. The comparison between $L_{eq,tr}$ and the estimated $\tilde{L}_{eq,tr}$ would be incorrect. Furthermore, working on sound mixtures simulated will create a controled framework.
-The mixtures are realized by \textit{simScene} developed by Mathias Rossignol and Gregoire Lafay \cite{simScene}\footnote{Open-source project available at: \url{https://bitbucket.org/mlagrange/simscene}} synthesized sound mixtures from a sound data base. This tool can control multiple parameters as the event/background ratio, the sample duration, the time between samples \dots Each of these averaged parameters are coupled with a standard deviation to bring some variability between the scenes produced. In the output, an audio file of the mix and for each sound class too is created. This allows us to know the specific contribution of each class, in our case it is the traffic. The sound data base we use is composed of sound samples provided by the author completed by others sounds found online (\textit{freesound.org}). The scenes are built with the first half of the data base, the second half will be used in the basis matrix $\mathbf{W}$.\\
+The mixtures are realized with \textit{simScene} software developed by Mathias Rossignol and Gregoire Lafay \cite{simScene} \footnote{Open-source project available at: \url{https://bitbucket.org/mlagrange/simscene}} which synthetizes sound mixtures from a sound data base. This tool can control multiple parameters as the event/background ratio, the sample duration, the time between samples \dots Each of these parameters is coupled with a standard deviation to bring some variability between the scenes produced. In the output, an audio file of the mix and for each sound class is created given us the access to the specific contribution of each class present in the scene. The sound data base we use is composed of sound samples provided with the software completed by others sounds found online (\textit{www.freesound.org}). The scenes are built with the first half of the data base, the second half being used in the basis matrix $\mathbf{W}$. The first constructed scenes are simple as test of feasibility, more realistic scenes fully consistent will be soon produced.\\
 
-For this preliminary study, 20 scenes are created with a duration of 15 s. Each one is composed of 3 classes of sounds that can typically be heard in urban areas: \textit{car}, \textit{bird} and \textit{horn}. The aim of this preliminary study is to see the influence of some parameters of the NMF on the quality of the traffic noise level estimation (the divergence calculation, the number of iteration).\\
+For this preliminary study, 20 scenes are created with a duration of 15 s. Each one is composed of 3 classes of sound that can typically be heard in urban areas: \textit{car}, \textit{bird} and \textit{horn}. The aim of this preliminary study is to see the influence of some parameters of the NMF on the quality of the traffic noise levels estimation such as the divergence calculation or the number of iteration.\\
 % and the number of class in $\mathbf{W}$).\\
 
-The aim is to perform an NMF on each scene to compare 
-the equivalent sound level of traffic, $L_{eq,tr}$ with the estimation given by the NMF $\tilde{L}_{eq,tr}$.
-Then, to evaluate the performance of the method, the RMSE is considered
+The aim is to perform an NMF on each scene $i$, to compare $L^i_{eq,tr}$ with $\tilde{L^i}_{eq,tr}$ to evaluate the performance of the method by computing the RMSE
 
 \begin{equation}
-RSME = \sqrt{\sum_{i = 1}^N((L^i_{eq,tr}-\tilde{L}^i_{eq,tr})^2}
+RSME = \sqrt{\frac{1}{N}\sum_{i = 1}^N(L^i_{eq,tr}-\tilde{L}^i_{eq,tr})^2}
 \end{equation}
 
-Figure \ref{fig:spectrogram} resumes the spectrograms obtained by simScene (on left) and by the NMF (on right) for one scene with Euclidean distance (\ref{eq:distEUC}) after 100 updates of $\mathbf{H}$. We can observe the bird on the frequency range $\left[3000-6000\right]$ Hz, the horn is characterized by its harmonic content whereas the car is mainly composed of low frequencies with a slower temporal evolution.
+Figure \ref{fig:spectrogram} resumes the spectrograms obtained by simScene (on left) and by the NMF (on right) for one scene with Euclidian distance (\ref{eq:distEUC}) after 100 updates of $\mathbf{H}$. We can observe the bird on the frequence range $\left[3000-6000\right]$ Hz, the horn is characterized by its harmonic content whereas the car is mainly composed of low frequencies with a slower temporal evolution.\\
 
-\begin{figure}[btp]
+\begin{figure}[t]
 \centering
-\includegraphics[width=.5\textwidth]{./images/bvak_Sc2_V_spectre_Euc.pdf}
-\caption{Spectrograms of a sound mixture composed with 3 sound classes (car, horn, bird). On the left, the audio gives by simScene, on the right, one given by the NMF}
+\includegraphics[width=5cm]{../../paperTrafficLevel16/images/bvak_Sc2_Vscene_spectre_Euc.pdf}
+\includegraphics[width=5cm]{../../paperTrafficLevel16/images/bvak_Sc2_Vapprox_spectre_Euc.pdf}
+\caption{Spectrograms of a sound mixture composed with 3 sound classes (\textit{car}, \textit{horn}, \textit{bird}). On the left, the audio gives by simScene, on the right, one given by the NMF}
 \label{fig:spectrogram}
 \end{figure}
 
-For each sound mixture, comparison between $L_{p,t}$ and $\tilde{L}_{p,t}$ for Euclidian distance, Kullback-Leibler and Itakura-Saïto divergences can be made (figure~\ref{fig:Lp}.
 
-\begin{figure}[btp]
+From each sound mixture, comparison between $L_{p,t}$ and $\tilde{L}_{p,t}$ for Euclidian distance, Kullback-Leibler and Itakura-Saïto divergences can be made (figure~\ref{fig:Lp})\\
+
+\begin{figure}[t]
 \centering
-\includegraphics[width=.5\textwidth]{images/Lp_bvak_Sc2_It98_nbCl3.pdf}
-\caption{Sound pressure level estimated and real of one scene for the distance and the two divergences. \ml{taille de font trop petites, eventuellement utiliser des traits plus epais}}
+\centerline{\includegraphics[scale=0.30]{../../paperTrafficLevel16/images/Lp_bvak_Sc2_It100_nbCl3.pdf}}
+\caption{Sound pressure level estimated and real of one scene for the distance and the two divergences.}
 \label{fig:Lp}
 \end{figure}
 
-Let us know consider the RMSE with respect to the number of iterations of the NMF for the three divergences on Figure \ref{fig:rmse}. The error between $L_{eq,tr}$ and the equivalent sound pressure of the global mixture. This resumes the error caused if the source separation is not realized and all sound sources are taken account without distinction.
+Let us now consider the RMSE with respect to the number of iterations of the NMF for the three divergences on Figure~\ref{fig:rmse}. The error between $L_{eq,tr}$ and the equivalent sound pressure of the global mixture, $L_{eq}$, is added. This corresponds to the error that would be done if no source separation was realized and all the sound sources were taken account without distinction.\\
 
-\begin{figure*}[btp]
+\begin{figure}[t]
 \centering
-\includegraphics[width=\textwidth]{images/comparaison_RMSE_nbCl3.pdf}
-\caption{RMSE evolution \ml{illisible, mettre en pleine page avec * ?}}
+\centerline{\includegraphics[scale=0.30]{../../paperTrafficLevel16/images/comparaison_RMSE_nbCl3.pdf}}
+\caption{RMSE evolution}
 \label{fig:rmse}
-\end{figure*}
+\end{figure}
 
 The application of the NMF to calculate the traffic noise level, in all cases, produce a better estimation than taking the sound mixture with all the sound source. The Kullback-Leibler divergence proposed the most interesting results with the lowest and the most stable RMSE.
 
 
 \section{Conclusion}
 
-In this article, we proposed to use the supervised NMF framework to estimate the traffic noise level in urban areas to improve the noise mapping with acoustic measurements. This method consists on building an approximation of the spectrogram of the acoustic measure by the product of two matrices : $W$, composed of spectra of different sound sources found in an urban area, and $H$,  bringing the temporal variation of each spectral template. By taking into account the \textit{traffic} element, an traffic noise level estimation is obtained. 
+In this article, we proposed to use the supervised NMF framework to estimate the road traffic noise levels based on measurements achieved in an urban context. Such approach would find many apllications in the environmental acoustics field such as improving noise maps with acoustic measurements. By taking account of the \textit{traffic} element from $\mathbf{W}$ and $\mathbf{V}$, an traffic noise level estimation is obtained.
 
-This method is tested on sound mixtures created by the simScene software which allows us to get the traffic contribution separately from the other sound contributions. By comparing the equivalent sound level between the traffic element of simScene and the estimation given by the NMF for three cost functions, the quality of this method is tested. The first results show that this method gives a better estimation of the sound level than if the source separation is not done proving its interest. Furthermore, it shows that the Kullback-Leibler divergence give the lowest error and therefore seems the cost function of choice to use for our future tests.
+This method is tested on sound mixtures created by the simScene software which allows us to get the traffic contribution separately from the other sounds. The method is tested by comparing the equivalent sound level between the traffic element of \textit{simScene} and the estimation given by the NMF for three cost functions. The first results show that this method gives a better estimation of the sound level than if the source separation is not done proving its interest. Both the road traffic time of presence and amplitude are accurately estimated, advocating for the use of the NMF for isolating the road traffic contribution. The Kullback-Leibler divergence results in the lowest errors will therefore receive specific attention for our future tests. 
 
+Further investigations with more realist and complex scenes are now required to confirm the behavior of the Kullabck-divergence. Then, some refinements of the NLF including acoustics considerations should improve the goodness of the road traffic noise levels estimation. For instance, the add of some temporal constraints with the smoothness NMF, to consider a better temporal evolution of the traffic elements or the improvement of the data sound base for the sound simulation with \textit{simScene} and for the basis matrix $\mathbf{W}$ should improve the modelling.
+
+\bibliographystyle{IEEEtran}
+\bibliography{refs}
 
 %All manuscripts must be submitted electronically as PDF files. 
 %All manuscripts must be formatted for white US letter paper 
@@ -368,8 +346,8 @@ This method is tested on sound mixtures created by the simScene software which a
 
 % -------------------------------------------------------------------------
 % Either list references using the bibliography style file IEEEtran.bst
-\bibliographystyle{IEEEtran}
-\bibliography{refs}
+%\bibliographystyle{IEEEtran}
+%\bibliography{refs}
 %
 % or list them by yourself
 % \begin{thebibliography}{9}
