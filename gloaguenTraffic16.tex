@@ -37,7 +37,6 @@
      }
 
 \begin{document}
-
 \ninept
 \maketitle
 
@@ -61,11 +60,18 @@ However, to achieve those important goals, we have to isolate the road traffic c
 
 The Non-negative Matrix Factorization (NMF) \cite{lee1999} has the advantage to deal with the overlap between the sound sources. It has been used for many applications in audio domain such as polyphonic music transcription \cite{smaragdis2003} or for source separation of musical content \cite{Virtanen2005}. Thus the NMF seems to be a suitable method for the isolation of the contribution of road traffic from measurements. We propose to apply an NMF scheme on a corpus of urban sound mixtures to validate its ability to estimate the noise level of road traffic. The specificity of urban sound environments, and the fact that the method has, to the best of our knowledge, never been used in this setting, stands as a challenge and requires specific adaptations.
 
-In this paper, we present the implementation of our experimental plan and some first results. Section~\ref{sec:method} exposes the structure of the proposed system based on the NMF framework. Then the experimental protocol is presented in Section~\ref{sec:experiment} and preliminar results are discussed in section~\ref{sec:results}.
+In this paper, we present the implementation of our experimental plan and some first results. Section~\ref{sec:method} exposes the structure of the proposed system based on the NMF framework. Then the experimental protocol is presented in Section~\ref{sec:experiment} and preliminary results are discussed in section~\ref{sec:results}.
 
 
 \section{Proposed Approach}\label{sec:method}
 
+\begin{figure*}[!ht]
+\centering
+\includegraphics[width=.7\textwidth]{images/bloc1.pdf}
+\caption{Block diagram of the proposed method \label{block}}
+\end{figure*}
+
+The aim of the system is estimate the level of some predefined sources in the mixture coming from measurements of the urban scene. As can be seen on Figure \ref{block}, the signal is first mapped to a time/frequency plane using the Short Time Fourier Transform. Using the NMF framework, the contribution of the road traffic is isolated and its level is estimated.
 
 \subsection{Non-Negative Matrix Factorization}
 The Non-negative Matrix Factorization is a dimension-reduction technique expressed by
@@ -108,9 +114,9 @@ where $\gamma(\beta) = 1$ for $\beta \in [1~2]$ and $\gamma(\beta) = \dfrac{1}{2
 
 \subsection{Method}
 
-Our approach consists in considering an audio signal recorded in an urban context, sampled at $44,1$ kHz and expressed in the time-frequency domain using a Short Time Fourier Transform. The size of the hanning window is 5000 points with an overlap of 50 \% and $NFFT = 4096$ points. The temporal resolution chosen is, for the moment, very low ($\Delta t \approx 0,05$ s). 
+Our approach consists in considering an audio signal recorded in an urban context, sampled at $44,1$ kHz and expressed in the time-frequency domain using a Short Time Fourier Transform. The size of the Hanning window is 5000 points with an overlap of 50 \% and $NFFT = 4096$ points. The temporal resolution chosen is, for the moment, very low ($\Delta t \approx 0,05$ s). 
 
-The supervised NMF is then performed with the spectrogram $\mathbf{V}$ in the input, a fixed dictionary $\mathbf{W}$ and $\mathbf{\tilde{V}}$ in the ouput. Currently, $\mathbf{H}$ is updated for a number of iteration fixed at 100. When the iteration is over, it is possible to estimate the level of the elements of interest. In the case of road traffic, $\mathbf{\tilde{V}}_{tr} = \left[\mathbf{WH}\right]_{tr}$ which allows to calculate the sound pressure level for each temporal frame
+The supervised NMF is then performed with the spectrogram $\mathbf{V}$ in the input, a fixed dictionary $\mathbf{W}$ and $\mathbf{\tilde{V}}$ in the output. Currently, $\mathbf{H}$ is updated for a number of iteration fixed at 100. When the iteration is over, it is possible to estimate the level of the elements of interest. In the case of road traffic, $\mathbf{\tilde{V}}_{tr} = \left[\mathbf{WH}\right]_{tr}$ which allows to calculate the sound pressure level for each temporal frame
 
 \begin{equation}\label{eq:Lp}
 \tilde{L}_{p,n} = 20\log\frac{\sum\mathbf{\mathbf{\tilde{v}}_{\mathbf{n},tr}}}{p_{0}}
@@ -125,14 +131,16 @@ with $\mathbf{\tilde{v}_{n,tr}}$, the $n$-th frame of matrix $\mathbf{\tilde{V}}
 
 where $T$ is the duration of $\mathbf{V}$.\\
 
-\begin{figure}[t]
-\centering
-\includegraphics[scale=0.35]{images/bloc1.pdf}
-\caption{Block diagram of the proposed method}
-\end{figure}
 
 
 \section{EXPERIMENT}\label{sec:experiment}
+
+\begin{figure*}[th!]
+\centering
+\includegraphics[width=\textwidth]{images/bvak_Sc2_Vapprox_spectre_Euc.pdf}
+\caption{Spectrograms of a sound mixture composed with 3 sound classes (\textit{car}, \textit{horn}, \textit{bird}). On the left, the audio given by simScene, on the right, one given by the NMF}
+\label{fig:spectrogram}
+\end{figure*}
 
 To evaluate the ability of the NMF framework to estimate the road traffic level, we consider simulated sounds mixtures where the actual level of contribution of the traffic is known. This solution ensures controlling the road traffic level, $L_{eq,tr}$, relatively to the other sources in comparison to real recordings where it would not be correctly determined. Furthermore, working on sound mixtures simulated will create a controlled framework where the time of presence of each source is exactly known which allows to produce specific sound environments (animated streets, parks \dots). 
 
@@ -146,21 +154,14 @@ RSME = \sqrt{\frac{1}{N}\sum_{i = 1}^N(L^i_{eq,tr}-\tilde{L}^i_{eq,tr})^2}.
 
 \section{Results}\label{sec:results}
 
-Figure \ref{fig:spectrogram} resumes the spectrograms obtained by simScene (on left) and by the NMF (on right) for one scene with Euclidian distance (\ref{eq:distEUC}) after 100 updates of $\mathbf{H}$. We can observe the bird on the frequence range $\left[3000-6000\right]$ Hz, the horn is characterized by its harmonic content whereas the car is mainly composed of low frequencies with a slower temporal evolution.
-
-\begin{figure*}[t]
-\centering
-\includegraphics[scale=0.30]{images/bvak_Sc2_Vapprox_spectre_Euc.pdf}
-\caption{Spectrograms of a sound mixture composed with 3 sound classes (\textit{car}, \textit{horn}, \textit{bird}). On the left, the audio given by simScene, on the right, one given by the NMF}
-\label{fig:spectrogram}
-\end{figure*}
+Figure \ref{fig:spectrogram} resumes the spectrograms obtained by simScene (on left) and by the NMF (on right) for one scene with Euclidean distance (\ref{eq:distEUC}) after 100 updates of $\mathbf{H}$. We can observe the bird on the frequency range $\left[3000-6000\right]$ Hz, the horn is characterized by its harmonic content whereas the car is mainly composed of low frequencies with a slower temporal evolution.
 
 
 From each sound mixture, comparison between $L_{p,t}$ and $\tilde{L}_{p,t}$ for Euclidean distance, Kullback-Leibler and Itakura-Saïto divergences can be made (Figure~\ref{fig:Lp})\\
 
 \begin{figure}[t]
 \centering
-\centerline{\includegraphics[scale=0.30]{images/Lp_bvak_Sc2_It100_nbCl3.pdf}}
+\centerline{\includegraphics[width=.5\textwidth]{images/Lp_bvak_Sc2_It100_nbCl3.pdf}}
 \caption{Sound pressure level estimated and real of one scene for the distance and the two divergences.}
 \label{fig:Lp}
 \end{figure}
@@ -171,7 +172,7 @@ Let us now consider the RMSE with respect to the number of iterations of the NMF
 
 \begin{figure}[t]
 \centering
-\includegraphics[scale=0.30]{images/comparaison_RMSE_nbCl3.pdf}
+\includegraphics[width=.5\textwidth]{images/comparaison_RMSE_nbCl3.pdf}
 \caption{RMSE evolution}
 \label{fig:rmse}
 \end{figure}
@@ -182,7 +183,9 @@ Surprisingly, the Itakura-divergence, despite its scale invariant property \cite
 
 \section{Conclusion}
 
-In this article, we proposed to use the supervised NMF framework to estimate the road traffic noise levels based on acoustic measurements achieved in an urban context. Such approach would find many applications in the environmental acoustics field such as 1) improving noise maps with acoustic measurements and 2) \ml{more}. By taking account of the \textit{traffic} element from $\mathbf{W}$ and $\mathbf{V}$, an traffic noise level estimation is obtained.
+In this article, we proposed to use the supervised NMF framework to estimate the road traffic noise levels based on acoustic measurements achieved in an urban context. In our opinion, such approach would find many applications in the environmental acoustics field such other than improving noise maps with acoustic measurements, for example acoustic biodiversity monitoring. 
+
+%By taking account of the \textit{traffic} element from $\mathbf{W}$ and $\mathbf{V}$, an traffic noise level estimation is obtained.
 
 This method is tested on sound mixtures simulated using the simScene software which allows us to get the exact traffic contribution separately from the other sounds. The method is tested by comparing the equivalent sound level between the traffic element of \textit{simScene} and the estimation given by the NMF for three cost functions. The first results show that this method gives us a better estimation of the sound level than if the source separation is not done, thus demonstrating its interest. Both the road traffic time of presence and amplitude are accurately estimated, advocating for the use of the NMF for isolating the road traffic contribution. The Kullback-Leibler divergence results in the lowest errors will therefore receive specific attention for future work. 
 
