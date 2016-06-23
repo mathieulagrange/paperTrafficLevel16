@@ -37,7 +37,7 @@
      }
 
 \begin{document}
-\ninept
+
 \maketitle
 
 \begin{sloppy}
@@ -190,7 +190,6 @@ In this article, we proposed to use the supervised NMF framework to estimate the
 This method is tested on sound mixtures simulated using the simScene software which allows us to get the exact traffic contribution separately from the other sounds. The method is tested by comparing the equivalent sound level between the traffic element of \textit{simScene} and the estimation given by the NMF for three cost functions. The first results show that this method gives us a better estimation of the sound level than if the source separation is not done, thus demonstrating its interest. Both the road traffic time of presence and amplitude are accurately estimated, advocating for the use of the NMF for isolating the road traffic contribution. The Kullback-Leibler divergence results in the lowest errors will therefore receive specific attention for future work. 
 
 Further investigations with more realist and complex scenes are now required to confirm the behavior of the Kullabck-divergence. Then, some refinements of the NMF including acoustics considerations should improve the goodness of the road traffic noise levels estimation. For instance, the addition of some temporal constraints with a smoothness constraint within the NMF framework such as \cite{fevotteSmooth} \cite{Essid} \cite{virtanenSmooth} to better model the temporal evolution of the traffic elements is currently investigated.
-
 
 \bibliographystyle{IEEEtran}
 \bibliography{refs}
